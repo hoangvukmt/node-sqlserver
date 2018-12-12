@@ -1,0 +1,41 @@
+{
+    "TestENV" : {
+        "dbConfig" :  {
+            "user": "sa",
+            "password": "Adminsql@123",
+            "server": "localhost",
+            "database": "HokenFolder"
+        },
+        "passwordEncrypt" : {
+            "passPhrase" : "HokenFolder2018",
+            "expression" : "irrc7539518246" 
+        },
+        "emailConfig" : {
+            "service": "gmail",
+            "host": "smtp.gmail.com",
+            "auth": {
+                "type": "login",
+                "user": "dev.ios@vnext.com.vn",
+                "pass": "vnext@d2-mobile"
+            },
+            "from" : "dev.ios@vnext.com.vn",
+            "subject": "HokenFolder_Confirm register_No Reply"
+        },
+        "token": {
+            "seed": "HOKEN@FOLDER@2018",
+            "expire": 86400
+        },
+        "utTestAcc": {
+            "login_id": "test@acc.com",
+            "password": "bc1bb089a4",
+            "agentCd": "ACEL "
+        },
+        "tempUpload": "./upload/temp",
+        "uploadPath": "./upload/img",
+        "relationPath": "./upload/img",
+        "messagePath": "./upload/img",
+        "bannerPath": "./upload/banner",
+        "pdfPath": "./upload/img",
+        "logPath": "./logs"
+    }
+}
