@@ -4,14 +4,14 @@
   "description": "serverside of hokenfolder-web version",
   "main": "app.js",
   "scripts": {
-    "test": "SET NODE_ENV=test & mocha ./spec/ut/test-setup.spec.js --exit",
+    "test": "SET NODE_ENV=test & mocha ./spec/kanri_ut/kanri_test-setup.spec.js --exit",
     "start": "node app.js",
     "installService": "winser -i -a",
     "uninstallService": "winser -r -x"
   },
   "repository": {
     "type": "git",
-    "url": "http://gitlab.infordio.co.jp/hokenfolder-web/server.git"
+    "url": "https://github.com/hoangvukmt/node-sqlserver.git"
   },
   "author": "",
   "license": "ISC",

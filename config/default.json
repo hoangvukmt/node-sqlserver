@@ -2,12 +2,12 @@
     "TestENV" : {
         "dbConfig" :  {
             "user": "sa",
-            "password": "Adminsql@123",
-            "server": "localhost",
-            "database": "HokenFolder"
+            "password": "asd123!@#",
+            "server": "VUHX",
+            "database": "LearnNodeJs"
         },
         "passwordEncrypt" : {
-            "passPhrase" : "HokenFolder2018",
+            "passPhrase" : "NodeJsTraining2021",
             "expression" : "irrc7539518246" 
         },
         "emailConfig" : {
@@ -15,20 +15,19 @@
             "host": "smtp.gmail.com",
             "auth": {
                 "type": "login",
-                "user": "dev.ios@vnext.com.vn",
-                "pass": "vnext@d2-mobile"
+                "user": "userOfEmail",
+                "pass": "passOfUser"
             },
-            "from" : "dev.ios@vnext.com.vn",
-            "subject": "HokenFolder_Confirm register_No Reply"
+            "from" : "fromEmailToSend",
+            "subject": "CheckMailReady_Confirm register_No Reply"
         },
         "token": {
-            "seed": "HOKEN@FOLDER@2018",
+            "seed": "NODEJS@TRAINING@2021",
             "expire": 86400
         },
         "utTestAcc": {
-            "login_id": "test@acc.com",
-            "password": "bc1bb089a4",
-            "agentCd": "ACEL "
+            "login_id": "userNameForTest",
+            "password": "password"
         },
         "tempUpload": "./upload/temp",
         "uploadPath": "./upload/img",

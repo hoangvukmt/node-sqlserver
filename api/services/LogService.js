@@ -1,7 +1,6 @@
 'use strict';
 
 const fs = require('fs');
-const util = require('util');
 const systemConfig = require('config');
 
 const commonUtil = require('../util/common');

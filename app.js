@@ -3,7 +3,6 @@
 const express = require('express');
 const db = require('./api/util/db_util');
 const router = require('./api/middleware/app_router');
-const kanriRouter = require('./api/middleware/kanri_router');
 var app = express();
 
 async function startServer() {
@@ -24,15 +23,10 @@ app.use('/', express.static('./front'));
 app.use('/register', express.static('./front'));
 app.use('/forget-pass', express.static('./front'));
 
-// use static for route of kanri-system
-app.use('/admin', express.static('./kanri'));
-app.use('/admin/login', express.static('./kanri'));
-
 // use authen for route of back-end
 app.use('/server', router);
-app.use('/kanri', kanriRouter);
-app.listen(3000);
 
+app.listen(5000);
 
 /**
  * Catch 404 err for request

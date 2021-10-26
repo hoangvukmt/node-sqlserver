@@ -2,7 +2,6 @@
 
 const systemConfig = require('config');
 const sql = require('mssql');
-let initialized = false;
 let sqlConnect = null;
 
 module.exports = {

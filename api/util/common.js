@@ -1,5 +1,4 @@
 'use_strict';
-const systemConfig = require('config');
 var mime = require('mime');
 const fs = require('fs');
 

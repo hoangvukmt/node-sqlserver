@@ -1,43 +1,8 @@
 'use strict';
 const logService = require('../services/LogService');
 const validation = require('../util/validation');
-const common = require('../util/common');
 const DB = require('../util/db_util');
 const sql = DB.sql;
-
-const T_Riyo = {
-    tableName: "T_Riyo",
-    columns: [
-        { key: "RiyoNo", type: sql.BigInt(8), isPk: true, defaultValue: null },
-        { key: "UserNo", type: sql.BigInt(8), isPk: false, defaultValue: null },
-        { key: "ActionCode", type: sql.TinyInt, isPk: false, defaultValue: 0 },
-        { key: "ActionContent", type: sql.NVarChar(200), isPk: false, defaultValue: null },
-        { key: "CreateDate", type: sql.DateTime, isPk: false, defaultValue: "getdate()" },
-        { key: "UpdateDate", type: sql.DateTime, isPk: false, defaultValue: "getdate()", defaultUpdate: "getdate()" }
-    ]
-};
-const logContent = {
-    HokenBunseki_Kaishi: '保険分析サービス開始',//1
-    Login: 'ログイン',//2
-    ChangePass: 'パスワード更新',//3
-    ReSendPass: 'パスワード忘れ依頼',//4
-    RegistFamily: '家族情報登録',//5
-    InsertFamily: '家族情報追加',//6
-    ChangeFamily: '家族情報更新',//7
-    DeleteFamily: '家族情報削除',//8
-    RequestInquiry: 'お問合せ依頼',//9
-    RequestDiagnostic: '簡易診断依頼',//10
-    RequestTrailAnalysis: 'お試し分析依頼',//11
-    RequestAutoInput: '保険証券自動入力依頼',//12
-    AddHoken: '保険証券登録',//13
-    ChangeHoken: '保険証券更新',//14
-    DeleteHoken: '保険証券削除',//15
-    AddHokenImage: '保険証券画像追加',//16
-    ClickBaner: 'バナー呼出「<バナーNo>」',//17
-    AddAgent: '保険代理店登録',//18
-    ChangeAgent: '保険代理店更新',//19
-    DeleteAgent: '保険代理店削除'//20
-}
 
 const orderWhiteList = ["asc", "desc", null];
 const operatorWhiteList = ["AND", "OR"];
@@ -67,7 +32,7 @@ function fillData(T_Table, data) {
 }
 
 // Insert data to table
-async function createNew(T_Table, data, logContent) {
+async function createNew(T_Table, data) {
     let sqlRequest = this.fillData(T_Table, data);
 
     let strField = "";
@@ -108,13 +73,8 @@ async function createNew(T_Table, data, logContent) {
                 }
             });
         });
-        let _this = this;
         await query.then(async function(res) {
             result = true;
-
-            if (logContent) {
-                _this.writeLog(logContent);
-            }
 
             let logData = [
                 { key: "Time", content: new Date() },
@@ -153,7 +113,7 @@ async function createNew(T_Table, data, logContent) {
 }
 
 // Insert data to table and return id inserted
-async function createNewGetId(T_Table, data, logContent) {
+async function createNewGetId(T_Table, data) {
     let sqlRequest = this.fillData(T_Table, data);
 
     let strField = "";
@@ -194,13 +154,8 @@ async function createNewGetId(T_Table, data, logContent) {
                 }
             });
         });
-        let _this = this;
         await query.then(async function(res) {
             result = res.recordset.length > 0 ? res.recordset[0] : null;
-
-            if (logContent) {
-                _this.writeLog(logContent);
-            }
 
             let logData = [
                 { key: "Time", content: new Date() },
@@ -240,7 +195,7 @@ async function createNewGetId(T_Table, data, logContent) {
 }
 
 // Update data by ID
-async function updateById(T_Table, data, logContent) {
+async function updateById(T_Table, data) {
     let fieldPk = "";
     let strFieldUpdate = "";
     let pkValue;
@@ -283,13 +238,8 @@ async function updateById(T_Table, data, logContent) {
                 }
             });
         });
-        let _this = this;
         await query.then(async function(res) {
             result = true;
-
-            if (logContent) {
-                _this.writeLog(logContent);
-            }
 
             let logData = [
                 { key: "Time", content: new Date() },
@@ -329,7 +279,7 @@ async function updateById(T_Table, data, logContent) {
 }
 
 // Update data by other condition
-async function updateByCondition(T_Table, data, objCondition, logContent) {
+async function updateByCondition(T_Table, data, objCondition) {
     let sqlRequest = this.fillData(T_Table, objCondition);
 
     let strFieldUpdate = "";
@@ -370,13 +320,8 @@ async function updateByCondition(T_Table, data, objCondition, logContent) {
                 }
             });
         });
-        let _this = this;
         await query.then(async function(res) {
             result = true;
-            
-            if (logContent) {
-                _this.writeLog(logContent);
-            }
 
             let logData = [
                 { key: "Time", content: new Date() },
@@ -416,7 +361,7 @@ async function updateByCondition(T_Table, data, objCondition, logContent) {
 }
 
 // Get detail by ID
-async function getDetailByID(T_Table, id, logContent) {
+async function getDetailByID(T_Table, id) {
     let data;
     let sqlRequest = new sql.Request();
     try {
@@ -444,13 +389,8 @@ async function getDetailByID(T_Table, id, logContent) {
                 }
             });
         });
-        let _this = this;
         await query.then(async function(res) {
             data = res;
-
-            if (logContent) {
-                _this.writeLog(logContent);
-            }
 
             let logData = [
                 { key: "Time", content: new Date() },
@@ -488,7 +428,7 @@ async function getDetailByID(T_Table, id, logContent) {
 }
 
 // Search data
-async function searchData(T_Table, objSearch, orders, otherCondition, logContent) {
+async function searchData(T_Table, objSearch, orders, otherCondition) {
     let sqlRequest = this.fillData(T_Table, objSearch);
     let data;
     try {
@@ -540,13 +480,8 @@ async function searchData(T_Table, objSearch, orders, otherCondition, logContent
             sqlStr += otherCondition;
         }
         let query = sqlRequest.query(sqlStr);
-        let _this = this;
         await query.then(async function(res) {
             data = res.recordset;
-
-            if (logContent) {
-                _this.writeLog(logContent);
-            }
 
             let logData = [
                 { key: "Time", content: new Date() },
@@ -585,7 +520,7 @@ async function searchData(T_Table, objSearch, orders, otherCondition, logContent
 }
 
 // Delete by condition
-async function deleteData(T_Table, data, logContent) {
+async function deleteData(T_Table, data) {
     let strWhere = "";
     for (var i = 0; i < T_Table.columns.length; i++) { 
         var item = T_Table.columns[i];
@@ -612,13 +547,8 @@ async function deleteData(T_Table, data, logContent) {
                 }
             });
         });
-        let _this = this;
         await query.then(async function(res) {
             result = true;
-            
-            if (logContent) {
-                _this.writeLog(logContent);
-            }
 
             let logData = [
                 { key: "Time", content: new Date() },
@@ -1097,62 +1027,7 @@ async function buildOrder(objSearch, fieldWhiteList, defaultOrder) {
     return orderStr;
 }
 
-// Write log
-async function writeLog(logContent) {
-    let logInfo = {
-        UserNo: logContent.UserNo,
-        ActionContent: logContent.ActionContent,
-        ActionCode: logContent.ActionCode
-    }
-    let sqlRequest = this.fillData(T_Riyo, logInfo);
-
-    let strField = "";
-    let strParam = "";
-    for (var i = 0; i < T_Riyo.columns.length; i++) { 
-        var item = T_Riyo.columns[i];
-        if (typeof logInfo[item.key] !== "undefined" && !item.isPk) {
-            strField += item.key + ","
-            strParam += "@" + item.key + ","
-        }
-        else {
-            if (item.defaultValue !== null && !item.isPk) {
-                strField += item.key + ","
-                strParam += item.defaultValue + ","
-            }
-        }
-    }
-    if (strField.length > 0) {
-        strField = strField.substr(0, strField.length - 1);
-        strParam = strParam.substr(0, strParam.length - 1);
-    }
-
-    let result;
-    try {
-        let sqlStr = `INSERT INTO ${T_Riyo.tableName} (${strField}) VALUES (${strParam})`;
-        let query = new Promise(function(resolve, reject) {
-            sqlRequest.query(sqlStr, function(err, res) {
-                if(res) {
-                    resolve(res);
-                }else {
-                    reject(err);
-                }
-            });
-        });
-        await query.then(res => {
-            result = true;
-        }).catch(err => {
-            console.log(err);
-            result = false;
-        });
-        return result;
-    } catch(err) {
-        console.log(err);
-        return false;
-    }
-}
-
 module.exports = {
-    logContent,
     DB,
     sql,
     fillData,
@@ -1164,6 +1039,5 @@ module.exports = {
     searchData,
     deleteData,
     buildFilter,
-    buildOrder,
-    writeLog
+    buildOrder
 };

@@ -11,10 +11,3 @@ describe('connectDB',   function(){
 //require all test file to make test order in mocha
 
 require('./kanri_user_service.spec');
-require('./kanri_kani_shindan_service.spec');
-require('./kanri_keiyaku_service.spec');
-require('./kanri_message_service.spec');
-require('./kanri_riyo_service.spec');
-require('./kanri_SelectItem_service.spec');
-require('./kanri_Image_service.spec');
-require('./kanri_HaishinLog_service.spec');
