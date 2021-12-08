@@ -144,6 +144,15 @@ async function updateById(updateUser) {
 }
 
 async function exportData(startTime) {
+    /* Xem lại đoạn này
+        - Nên gọi vào getAllData() trong model để lấy dữ liệu
+        - Sau khi đã có dữ liệu thì gọi excelHelper.exportData để xuất ra excel
+        - Bởi vì:
+            + Việc xuất dữ liệu ra thành file excel là một nghiệp vụ rõ ràng
+            + Việc xử lý nghiệp vụ do lớp service đảm nhiệm model chỉ truy vấn BD thôi
+            => vi phạm coding convention về quy ước nhiệm vụ giữa các tầng
+        - Xem tiếp comment trong hàm excelHelper.exportData
+    */
     let data = await UserModel.exportData(startTime); 
     if (!data) {
         return {
