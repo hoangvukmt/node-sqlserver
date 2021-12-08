@@ -13,7 +13,8 @@ const commonUtil = require('../util/common');
 //check token is not required with register, login, reset password api...
 //defined by below NotAuthen array
 const NotAuthen = [
-    '/server/api/login'
+    '/server/api/login',
+    '/server/api/create'
 ];
 
 var router = express.Router();
@@ -31,7 +32,7 @@ router.use(cors());
 router.use(function (req, res, next) {
     var token = req.headers['x-access-token'];
     let orgUrl = req.originalUrl;
-
+    
     // xss filter
     Object.keys(req.body).forEach(function(key, index) {
         if (typeof req.body[key] !== "undefined" && req.body[key] !== null) {
@@ -64,6 +65,15 @@ router.use(function (req, res, next) {
 router.post('/api/login', function(req, res){
     return UserController.login(req, res)
 });
+router.post('/api/create', function(req, res){
+    return UserController.create(req, res)
+})
+router.post('/api/update', function(req, res) {
+    return UserController.updateById(req, res)
+})
+router.post('/api/export', function(req, res) {
+    return UserController.exportData(req, res)
+})
 //#endregion
 
 //#region error handle ------------------------------------------------------------------------------------

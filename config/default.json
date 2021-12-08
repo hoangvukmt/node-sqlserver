@@ -2,8 +2,8 @@
     "TestENV" : {
         "dbConfig" :  {
             "user": "sa",
-            "password": "asd123!@#",
-            "server": "VUHX",
+            "password": "123",
+            "server": "INT-DUONGNT",
             "database": "LearnNodeJs"
         },
         "passwordEncrypt" : {

@@ -5,6 +5,7 @@ const sql = baseModel.sql;
 const systemConfig = require('config');
 const passEncrypt = systemConfig.get('TestENV.passwordEncrypt');
 const logService = require('../services/LogService');
+const excelHelper = require('../util/excelHelper');
 
 const T_Table = {
     tableName: "T_User",
@@ -158,8 +159,19 @@ async function updateUser(data) {
     return baseModel.updateById(T_Table, data);
 }
 
+async function getAllData() {
+    return baseModel.getAllData(T_Table)
+}
+async function exportData(startTime) {
+    let data = await this.getAllData();
+    let result = await excelHelper.exportData(T_Table, data, startTime);
+    return excelHelper.exportData(T_Table, data, startTime);
+}
+
 module.exports = {
     asyncGetUserbyLoginId,
     asyncCreateUser,
-    updateUser
+    updateUser,
+    getAllData,
+    exportData
 }

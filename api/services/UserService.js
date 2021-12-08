@@ -73,11 +73,96 @@ async function login(loginUser) {
     } else {
         return {
             code: ResCode.AUTH_FAIL,
-            message:'LoginId/Password incorrect!'
+            message:'Password incorrect!'
         }
     }
 }
 
+async function create(createUser) {
+    let login_id = createUser.LoginId;
+    let password = createUser.Password;
+
+    let data = await UserModel.asyncCreateUser(createUser); 
+
+    if (!data) {
+        return {
+            code: ResCode.AUTH_FAIL,
+            message:'No data'
+        }
+    }
+
+    if (data){
+        // create a token
+        const token = jwt.sign(
+            {
+                login_id: login_id,
+                user_no: data.UserNo
+            },
+            systemConfig.get('TestENV.token.seed'),
+            {
+                expiresIn: systemConfig.get('TestENV.token.expire')
+            }
+        );
+
+        if (typeof process.env.NODE_ENV !== "undefined" && process.env.NODE_ENV.trim() === 'test') {
+            process.env.token = token;
+        }
+        return {
+            code: ResCode.SUCCESS,
+            message: 'Create success',
+            data: { 
+                token: token, 
+                user_no: data.UserNo
+            }
+        }
+    } 
+}
+
+async function updateById(updateUser) {
+    let login_id = updateUser.LoginId;
+    let password = updateUser.Password;
+    let user_no = updateUser.UserNo;
+
+    let data = await UserModel.updateUser(updateUser); 
+
+    if (!data) {
+        return {
+            code: ResCode.AUTH_FAIL,
+            message:'No data'
+        }
+    }
+
+    if (data){
+        return {
+            code: ResCode.SUCCESS,
+            message: 'Update success',
+            data: { 
+                user_no: data.UserNo
+            }
+        }
+    } 
+}
+
+async function exportData(startTime) {
+    let data = await UserModel.exportData(startTime); 
+    if (!data) {
+        return {
+            code: ResCode.AUTH_FAIL,
+            message:'Export fail'
+        }
+    }
+
+    if (data){
+        return {
+            code: ResCode.SUCCESS,
+            message: 'Export success',
+        }
+    } 
+}
+
 module.exports = {
-    login
+    login,
+    create,
+    updateById,
+    exportData
 }

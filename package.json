@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "SET NODE_ENV=test & mocha ./spec/kanri_ut/kanri_test-setup.spec.js --exit",
-    "start": "node app.js",
+    "start": "nodemon app.js",
     "installService": "winser -i -a",
     "uninstallService": "winser -r -x"
   },
@@ -19,6 +19,7 @@
     "chai": "^4.1.2",
     "chai-http": "^4.0.0",
     "config": "^1.30.0",
+    "exceljs": "^4.3.0",
     "express": "^4.16.3",
     "express-session": "^1.15.6",
     "formidable": "^1.2.1",
@@ -38,6 +39,7 @@
     "cors": "^2.8.4",
     "crypto": "^1.0.1",
     "nodemailer": "^4.6.5",
+    "nodemon": "^2.0.15",
     "supertest": "^3.1.0",
     "uuid": "^3.2.1"
   }

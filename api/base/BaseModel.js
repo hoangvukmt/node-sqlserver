@@ -19,6 +19,8 @@ const conditionWhiteList = [
     "greaterThanOrEqual",
     "inRange"
 ];
+const systemConfig = require('config');
+const passEncrypt = systemConfig.get('TestENV.passwordEncrypt');
 
 function fillData(T_Table, data) {
     var sqlRequest = new sql.Request();
@@ -30,6 +32,21 @@ function fillData(T_Table, data) {
     }
     return sqlRequest;
 }
+
+function fillDataInput(T_Table, data) {
+    var sqlRequest = new sql.Request();
+    for (var i = 0; i < T_Table.columns.length; i++) { 
+        var item = T_Table.columns[i];
+        if (typeof data[item.key] !== "undefined" && item.key!=="Password") {
+            sqlRequest.input(item.key, item.type, data[item.key]);
+        }
+        if (typeof data[item.key] !== "undefined" && item.key==="Password") {
+            sqlRequest.input(item.key, sql.NVarChar, data[item.key]);
+        }
+    }
+    return sqlRequest;
+}
+
 
 // Insert data to table
 async function createNew(T_Table, data) {
@@ -206,8 +223,13 @@ async function updateById(T_Table, data) {
             pkValue = data[item.key];
         }
 
-        if (typeof data[item.key] !== "undefined" && !item.isPk) {
+        if (typeof data[item.key] !== "undefined" && !item.isPk && item.key !=="Password") {
             strFieldUpdate +=  `[${item.key}] = @${item.key},`;
+        }
+        else if (item.key === "Password" && typeof data[item.key] !== "undefined") {
+            strFieldUpdate +=  `[Password] = ENCRYPTBYPASSPHRASE('${passEncrypt.passPhrase}',@Password,1,convert(varbinary(MAX), '${passEncrypt.expression}')),`;
+            // sqlRequest.input(item.key, item.type , Buffer.from(data[item.key], 'latin1'));
+            // sqlRequest.input('Password', sql.NVarChar, data[item.key]);
         }
         else {
             if (typeof item.defaultUpdate !== "undefined" && item.defaultUpdate !== 'none' && !item.isPk) {
@@ -220,12 +242,11 @@ async function updateById(T_Table, data) {
     if (!objUpdate) {
         return false;
     }
-
     if (strFieldUpdate.length > 0) {
         strFieldUpdate = strFieldUpdate.substr(0, strFieldUpdate.length - 1);
     }
 
-    let sqlRequest = this.fillData(T_Table, data);
+    let sqlRequest = this.fillDataInput(T_Table, data);
     let result;
     try {
         let sqlStr = `UPDATE ${T_Table.tableName} SET ${strFieldUpdate} WHERE [${fieldPk}] = @${fieldPk}`;
@@ -1027,10 +1048,151 @@ async function buildOrder(objSearch, fieldWhiteList, defaultOrder) {
     return orderStr;
 }
 
+// Change password
+async function changePassword(T_Table, data) {
+    let fieldPk = "";
+    let strFieldUpdate = "";
+    let pkValue;
+    let sqlRequest = new sql.Request();
+    for (var i = 0; i < T_Table.columns.length; i++) { 
+        var item = T_Table.columns[i];
+        if (item.isPk) {
+            fieldPk = item.key;
+            pkValue = data[item.key];
+            sqlRequest.input(fieldPk, item.type, pkValue);
+        }
+
+        if (item.key == "Password" && typeof data[item.key] !== "undefined") {
+            strFieldUpdate +=  `[Password] = ENCRYPTBYPASSPHRASE('${passEncrypt.passPhrase}',@Password,1,convert(varbinary(MAX), '${passEncrypt.expression}'))`;
+            // sqlRequest.input(item.key, item.type , Buffer.from(data[item.key], 'latin1'));
+            sqlRequest.input('Password', sql.NVarChar, data[item.key]);
+        }
+    }
+    let result;
+    try {
+        let sqlStr = `UPDATE ${T_Table.tableName} SET ${strFieldUpdate} WHERE [${fieldPk}] = @${fieldPk}`
+        let query = new Promise(function (resolve, reject) {
+            sqlRequest.query(sqlStr, (err, result) => {
+                if(result) {
+                    resolve(result);
+                } else {
+                    reject(err);
+                }
+            });
+        });
+        await query.then(async function(res) {
+            result = true;
+
+            let logData = [
+                { key: "Time", content: new Date() },
+                { key: "File", content: "T_User.js" },
+                { key: "Function", content: "changePassword" },
+                { key: "Sql", content: sqlStr },
+                { key: "Param", content: JSON.stringify(data) }
+            ]
+            await logService.sqlLog(logData);
+        }).catch(async function(err) {
+            result = false;
+
+            let logData = [
+                { key: "Time", content: new Date() },
+                { key: "File", content: "T_User.js" },
+                { key: "Function", content: "changePassword" },
+                { key: "Sql", content: sqlStr },
+                { key: "Param", content: JSON.stringify(data) },
+                { key: "Err", content: err }
+            ]
+            await logService.errorLog(logData);
+        });
+        return result;
+    } catch (err) {
+        let logData = [
+            { key: "Time", content: new Date() },
+            { key: "File", content: "T_User.js" },
+            { key: "Function", content: "changePassword" },
+            { key: "Table", content: T_Table.tableName },
+            { key: "Param", content: JSON.stringify(data) },
+            { key: "Err", content: err }
+        ]
+        await logService.errorLog(logData);
+
+        return false;
+    }
+}
+
+// get all data
+async function getAllData(T_Table) {
+    let strField ="";
+    let queryResult = null;
+    for (var i = 0; i < T_Table.columns.length; i++) { 
+        var item = T_Table.columns[i];
+        if(item.key !== "Password"){
+            strField +=  `[${item.key}],`;
+        }
+    }
+    if (strField.length > 0) {
+        strField = strField.substr(0, strField.length - 1);
+    }
+    let sqlRequest = new sql.Request();
+    let result;
+    try {
+        let sqlStr = `SELECT ${strField} FROM ${T_Table.tableName}`
+        let query = new Promise(function (resolve, reject) {
+            sqlRequest.query(sqlStr, (err, result) => {
+                if(result) {
+                    resolve(result);
+                } else {
+                    reject(err);
+                }
+            });
+        });
+        await query.then(async function(res) {
+            result = true;
+            queryResult = res.recordset.length > 0 ? res.recordset : null
+
+            let logData = [
+                { key: "Time", content: new Date() },
+                { key: "File", content: "BaseModel.js" },
+                { key: "Function", content: "getAllData" },
+                { key: "Sql", content: sqlStr },
+                { key: "Param", content: "No data" }
+            ]
+            await logService.sqlLog(logData);
+        }).catch(async function(err) {
+            result = false;
+
+            let logData = [
+                { key: "Time", content: new Date() },
+                { key: "File", content: "BaseModel.js" },
+                { key: "Function", content: "getAllData" },
+                { key: "Sql", content: sqlStr },
+                { key: "Param", content: "No data" },
+                { key: "Err", content: err }
+            ]
+            await logService.errorLog(logData);
+        });
+        return queryResult;
+    } catch (err) {
+        let logData = [
+            { key: "Time", content: new Date() },
+            { key: "File", content: "BaseModel.js" },
+            { key: "Function", content: "getAllData" },
+            { key: "Table", content: T_Table.tableName },
+            { key: "Param", content: "No data" },
+            { key: "Err", content: err }
+        ]
+        await logService.errorLog(logData);
+
+        return false;
+    }
+}
+
+
 module.exports = {
     DB,
     sql,
     fillData,
+    fillDataInput,
     createNew,
     createNewGetId,
     updateById,
@@ -1039,5 +1201,8 @@ module.exports = {
     searchData,
     deleteData,
     buildFilter,
-    buildOrder
+    buildOrder,
+    changePassword,
+    getAllData,
+
 };
